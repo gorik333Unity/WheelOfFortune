@@ -9,11 +9,10 @@ namespace Game.LevelRun
 
         private LevelRunner _currentLevelRunner;
 
-        private void Awake()
+        public void Initialize()
         {
             _currentLevelRunner = _twoDimensionalLevelRunner;
-            _twoDimensionalLevelRunner.Initialize();
-            _twoDimensionalLevelRunner.Activate();
+            _currentLevelRunner.Initialize();
         }
 
         public void Activate()
