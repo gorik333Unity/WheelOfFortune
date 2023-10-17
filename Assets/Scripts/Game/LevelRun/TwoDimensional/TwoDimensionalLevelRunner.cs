@@ -1,4 +1,6 @@
 using Economy;
+using Helpers;
+using SaveModule;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,10 +28,16 @@ namespace Game.LevelRun.TwoDimensional
         private TMP_Text _spinButtonText;
 
         [SerializeField]
+        private TMP_Text _lastWinText;
+
+        [SerializeField]
         private string _wheelSpinningText;
 
         [SerializeField]
         private string _wheelIdleText;
+
+        [SerializeField]
+        private string _lastWinInfo;
 
         [SerializeReference, SubclassSelector]
         private TwoDimensionalGameController _twoDimensionalGameController;
@@ -39,6 +47,7 @@ namespace Game.LevelRun.TwoDimensional
             InitializeButtons();
             InitializeGameController();
             InitializeInputFields();
+            RefreshLastWinScore();
             _content.gameObject.SetActive(false);
         }
 
@@ -52,6 +61,14 @@ namespace Game.LevelRun.TwoDimensional
         {
             _twoDimensionalGameController.Deactivate();
             _content.gameObject.SetActive(false);
+        }
+
+        private void RefreshLastWinScore()
+        {
+            var reward = SaveSystem.LoadLastWinScore();
+
+            var result = $"{_lastWinInfo} {Extensions.GetBriefTextOfScore(reward)}";
+            _lastWinText.text = result;
         }
 
         private void InitializeInputFields()
@@ -100,7 +117,7 @@ namespace Game.LevelRun.TwoDimensional
                 _twoDimensionalGameController.SetSpinDuration(spinDuration);
             }
 
-            if (piecesCount > 0f && spinDuration > 0f)
+            if (piecesCount > 0f || spinDuration > 0f)
             {
                 _twoDimensionalGameController.ApplyChanges();
             }
@@ -122,7 +139,12 @@ namespace Game.LevelRun.TwoDimensional
             _spinButton.interactable = true;
             _spinButtonText.text = _wheelIdleText;
 
-            SimpleEconomy.AddScore(obj.Reward);
+            var reward = obj.Reward;
+            SimpleEconomy.AddScore(reward);
+
+            var result = $"{_lastWinInfo} {Extensions.GetBriefTextOfScore(reward)}";
+            _lastWinText.text = result;
+            SaveSystem.SaveLastWinScore(reward);
         }
     }
 }
